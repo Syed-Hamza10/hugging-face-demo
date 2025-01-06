@@ -1,16 +1,16 @@
 from transformers import pipeline
-from flask import Flask, request, jsonify
+import gradio as gr
 
-app = Flask(__name__)
 
-# Load pre-trained model
-sentiment_model = pipeline("sentiment-analysis")
+model = pipeline(
+    "summarization",
+)
 
-@app.route("/predict", methods=["POST"])
-def predict():
-    text = request.json.get("text")
-    result = sentiment_model(text)
-    return jsonify(result)
+def predict(prompt):
+    summary = model(prompt)[0]["summary_text"]
+    return summary
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+
+# create an interface for the model
+with gr.Interface(predict, "textbox", "text") as interface:
+    interface.launch()
